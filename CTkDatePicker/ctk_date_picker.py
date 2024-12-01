@@ -10,6 +10,7 @@ class CTkDatePicker(ctk.CTkFrame):
         
         Parameters:
         - master: The parent widget.
+        - notify: A function to be called when a date is selected.
         - **kwargs: Additional keyword arguments passed to the CTkFrame constructor.
         
         Initializes the date entry, calendar button, popup, and other related components.
@@ -17,16 +18,52 @@ class CTkDatePicker(ctk.CTkFrame):
         
         super().__init__(master, **kwargs)
 
+        self.notify = None
+
         self.date_entry = ctk.CTkEntry(self)
         self.date_entry.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
-        
+        self.date_entry.bind("<FocusOut>", self.validate_input)
+        self.date_entry.bind("<Return>", self.validate_input)  # Bind Enter key to validate input
+
         self.calendar_button = ctk.CTkButton(self, text="▼", width=20, command=self.open_calendar)
         self.calendar_button.grid(row=0, column=1, sticky="ew", padx=5, pady=5)
 
         self.popup = None
         self.selected_date = None
         self.date_format = "%m/%d/%Y"
-        self.allow_manual_input = True  
+        self.allow_manual_input = True
+
+    def set_notify_method(self, callback):
+        """
+        Set the method to be called when a date is selected.
+
+        Parameters:
+        - callback: The function to be called when a date is selected.
+        """
+        self.notify = callback
+
+    def validate_input(self, event=None):
+        """
+        Validate the date entered manually in the entry field.
+
+        Resets the field if the input is invalid.
+        """
+        if not self.allow_manual_input:
+            return
+
+        input_date = self.date_entry.get()
+        try:
+            parsed_date = datetime.strptime(input_date, self.date_format)
+            self.selected_date = parsed_date
+            self.notify(self.date_entry.get())
+        except ValueError:
+            # Show feedback and reset entry field to last valid date
+            if self.selected_date:
+                self.date_entry.delete(0, tk.END)
+                self.date_entry.insert(0, self.selected_date.strftime(self.date_format))
+            else:
+                self.date_entry.delete(0, tk.END)
+                self.date_entry.insert(0, "Invalid date")
         
     def set_date_format(self, date_format):
         """
@@ -158,6 +195,8 @@ class CTkDatePicker(ctk.CTkFrame):
             self.date_entry.configure(state='disabled')
         self.popup.destroy()
         self.popup = None
+        if self.notify:
+            self.notify(self.date_entry.get())
 
         
     def get_date(self):
