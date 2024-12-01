@@ -55,6 +55,12 @@ if __name__ == "__main__":
   date_picker.set_date_format("%d-%m-%Y")
   ```
 
+- **Callback Method**: You can set a method to be called when a date was set
+
+  ```python
+  date_picker.set_callback(print)
+``
+
 - **Allow Manual Input**: Enable or disable manual date input using the `set_allow_manual_input` method.
 
   ```python
