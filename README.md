@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
   ```python
   date_picker.set_callback(print)
-``
+  ``
 
 - **Allow Manual Input**: Enable or disable manual date input using the `set_allow_manual_input` method.
 
