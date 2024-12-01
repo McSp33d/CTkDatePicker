@@ -9,6 +9,9 @@ if __name__ == "__main__":
     date_picker = CTkDatePicker(root)
     date_picker.pack(padx=20, pady=20)
     date_picker.set_allow_manual_input(False)
+
+    #set callback method
+    date_picker.set_callback(print)
     
     # get value
     # date.picker.get_date()
