@@ -10,7 +10,7 @@ class CTkDatePicker(ctk.CTkFrame):
         
         Parameters:
         - master: The parent widget.
-        - notify: A function to be called when a date is selected.
+        - callback: A function to be called when a date is selected.
         - **kwargs: Additional keyword arguments passed to the CTkFrame constructor.
         
         Initializes the date entry, calendar button, popup, and other related components.
@@ -18,7 +18,7 @@ class CTkDatePicker(ctk.CTkFrame):
         
         super().__init__(master, **kwargs)
 
-        self.notify = None
+        self.callback = None
 
         self.date_entry = ctk.CTkEntry(self)
         self.date_entry.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
@@ -33,14 +33,14 @@ class CTkDatePicker(ctk.CTkFrame):
         self.date_format = "%m/%d/%Y"
         self.allow_manual_input = True
 
-    def set_notify_method(self, callback):
+    def set_callback(self, callback):
         """
         Set the method to be called when a date is selected.
 
         Parameters:
         - callback: The function to be called when a date is selected.
         """
-        self.notify = callback
+        self.callback = callback
 
     def validate_input(self, event=None):
         """
@@ -55,7 +55,8 @@ class CTkDatePicker(ctk.CTkFrame):
         try:
             parsed_date = datetime.strptime(input_date, self.date_format)
             self.selected_date = parsed_date
-            self.notify(self.date_entry.get())
+            if self.callback:
+                self.callback(self.date_entry.get())
         except ValueError:
             # Show feedback and reset entry field to last valid date
             if self.selected_date:
@@ -195,8 +196,8 @@ class CTkDatePicker(ctk.CTkFrame):
             self.date_entry.configure(state='disabled')
         self.popup.destroy()
         self.popup = None
-        if self.notify:
-            self.notify(self.date_entry.get())
+        if self.callback:
+            self.callback(self.date_entry.get())
 
         
     def get_date(self):
